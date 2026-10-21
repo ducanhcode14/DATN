@@ -218,3 +218,4 @@ exports.deleteEquipment = async (req, res) => {
     });
   }
 };
+

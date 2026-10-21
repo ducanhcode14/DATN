@@ -29,3 +29,4 @@ const equipmentCategorySchema = new mongoose.Schema(
 );
 
 module.exports = mongoose.model('EquipmentCategory', equipmentCategorySchema);
+

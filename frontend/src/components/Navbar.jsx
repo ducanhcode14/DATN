@@ -90,3 +90,4 @@ const Navbar = ({ title }) => {
 };
 
 export default Navbar;
+

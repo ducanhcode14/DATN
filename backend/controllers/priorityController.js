@@ -146,3 +146,4 @@ exports.updateCriteriaWeights = async (req, res) => {
     });
   }
 };
+

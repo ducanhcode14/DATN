@@ -12,3 +12,4 @@ router.get('/criteria', priorityController.getCriteria);
 router.put('/criteria', authorize('admin', 'manager'), priorityController.updateCriteriaWeights);
 
 module.exports = router;
+

@@ -11,3 +11,4 @@ router.post('/', incidentController.createIncident); // Bất kỳ user nào đ�
 router.patch('/:id', authorize('admin', 'manager', 'technician'), incidentController.updateIncident);
 
 module.exports = router;
+

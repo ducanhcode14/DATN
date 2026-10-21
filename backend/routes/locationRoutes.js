@@ -8,3 +8,4 @@ router.post('/', protect, authorize('admin', 'manager'), locationController.crea
 router.put('/:id', protect, authorize('admin', 'manager'), locationController.updateLocation);
 
 module.exports = router;
+

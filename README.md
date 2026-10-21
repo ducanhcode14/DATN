@@ -152,3 +152,4 @@ Truy cập trình duyệt: **`http://localhost:3000`**
    - Mở màn hình **Đánh giá ưu tiên** $\rightarrow$ Kéo thử thanh trượt trọng số $W_1-W_5$ để thấy điểm số thay đổi tự động.
    - Nhấn **Lập kế hoạch bảo trì** từ các thiết bị ưu tiên cao $\rightarrow$ Chuyển sang màn hình Kế hoạch.
    - Đổi vai trò sang `kythuat` $\rightarrow$ Cập nhật hoàn thành 1 thiết bị $\rightarrow$ Kiểm tra thấy ngày bảo trì gần nhất và trạng thái thiết bị được cập nhật tự động (BR-06).
+

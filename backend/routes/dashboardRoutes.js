@@ -7,3 +7,4 @@ router.use(protect);
 router.get('/summary', dashboardController.getDashboardSummary);
 
 module.exports = router;
+

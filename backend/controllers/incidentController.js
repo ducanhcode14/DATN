@@ -182,3 +182,4 @@ exports.updateIncident = async (req, res) => {
     });
   }
 };
+

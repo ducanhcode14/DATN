@@ -12,3 +12,4 @@ router.put('/:id', authorize('admin', 'manager', 'technician'), equipmentControl
 router.delete('/:id', authorize('admin', 'manager'), equipmentController.deleteEquipment);
 
 module.exports = router;
+

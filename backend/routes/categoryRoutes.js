@@ -8,3 +8,4 @@ router.post('/', protect, authorize('admin', 'manager'), categoryController.crea
 router.put('/:id', protect, authorize('admin', 'manager'), categoryController.updateCategory);
 
 module.exports = router;
+

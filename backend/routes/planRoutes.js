@@ -12,3 +12,4 @@ router.put('/:id', authorize('admin', 'manager'), planController.updatePlan);
 router.patch('/:id/items/:itemId', authorize('admin', 'manager', 'technician'), planController.updatePlanItem);
 
 module.exports = router;
+

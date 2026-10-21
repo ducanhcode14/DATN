@@ -87,3 +87,4 @@ const maintenancePlanSchema = new mongoose.Schema(
 );
 
 module.exports = mongoose.model('MaintenancePlan', maintenancePlanSchema);
+

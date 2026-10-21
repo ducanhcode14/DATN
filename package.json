@@ -1,0 +1,14 @@
+{
+  "name": "equipment-maintenance-system",
+  "version": "1.0.0",
+  "description": "Hệ thống quản lý và hỗ trợ lập kế hoạch bảo trì thiết bị - Bùi Đức Anh",
+  "main": "start.js",
+  "scripts": {
+    "start": "node start.js",
+    "dev": "node start.js",
+    "seed": "cd backend && npm run seed"
+  },
+  "keywords": ["maintenance", "equipment", "mcda", "react", "express", "mongodb"],
+  "author": "Bùi Đức Anh",
+  "license": "ISC"
+}

@@ -11,3 +11,4 @@ router.post('/', authorize('admin', 'manager', 'technician'), maintenanceControl
 router.put('/:id', authorize('admin', 'manager', 'technician'), maintenanceController.updateMaintenance);
 
 module.exports = router;
+

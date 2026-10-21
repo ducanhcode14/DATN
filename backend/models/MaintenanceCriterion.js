@@ -46,3 +46,4 @@ const maintenanceCriterionSchema = new mongoose.Schema(
 );
 
 module.exports = mongoose.model('MaintenanceCriterion', maintenanceCriterionSchema);
+

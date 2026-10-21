@@ -508,3 +508,4 @@ const Equipments = () => {
 };
 
 export default Equipments;
+

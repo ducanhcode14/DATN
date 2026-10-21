@@ -9,3 +9,4 @@ router.use(authorize('admin', 'manager'));
 router.get('/:type', reportController.getReportData);
 
 module.exports = router;
+

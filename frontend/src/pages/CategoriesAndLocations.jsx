@@ -316,3 +316,4 @@ const CategoriesAndLocations = () => {
 };
 
 export default CategoriesAndLocations;
+
