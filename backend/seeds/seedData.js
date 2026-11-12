@@ -1,6 +1,7 @@
 require('dotenv').config({ path: __dirname + '/../.env' });
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const { ensureMongoRunning } = require('../config/ensureMongo');
 
 const User = require('../models/User');
 const EquipmentCategory = require('../models/EquipmentCategory');
@@ -14,6 +15,9 @@ const MaintenanceCriterion = require('../models/MaintenanceCriterion');
 const seedDatabase = async () => {
   try {
     const mongoUri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/equipment_maintenance';
+    if (mongoUri.includes('127.0.0.1') || mongoUri.includes('localhost')) {
+      await ensureMongoRunning(27017);
+    }
     console.log(`[Seed] Đang kết nối tới MongoDB: ${mongoUri}`);
     await mongoose.connect(mongoUri);
 

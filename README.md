@@ -117,22 +117,33 @@ d:\doantotnghiep\
 
 ---
 
-## 4. Hướng dẫn Chạy Hệ thống
+## 4. Hướng dẫn Chạy Hệ thống trên Terminal VS Code
 
-### 1. Khởi động Backend:
+### Cách 1: Chạy tất cả bằng 1 lệnh duy nhất (Khuyên dùng)
+Mở Terminal trong VS Code tại thư mục gốc `d:\doantotnghiep` và gõ:
 ```bash
-cd backend
-npm install
-npm run seed     # Nạp sẵn 100 thiết bị, 170 sự cố, 120 bảo trì và tài khoản mẫu
-npm start        # Backend chạy tại http://localhost:5000
+npm start
 ```
+*(Hệ thống sẽ tự động kiểm tra MongoDB, tự động khởi động MongoDB nếu chưa chạy, sau đó chạy đồng thời Backend và Frontend).*
 
-### 2. Khởi động Frontend:
-```bash
-cd frontend
-npm install
-npm run dev      # Giao diện web chạy tại http://localhost:3000
-```
+---
+
+### Cách 2: Chạy riêng từng Terminal (Split Terminal trong VS Code)
+Nếu muốn xem riêng log của từng bên:
+
+- **Terminal 1 (Backend):**
+  ```bash
+  cd backend
+  npm start
+  ```
+  *(Backend chạy tại `http://localhost:5000`. Cơ chế thông minh sẽ tự động bật MongoDB nếu cổng 27017 chưa mở).*
+
+- **Terminal 2 (Frontend):**
+  ```bash
+  cd frontend
+  npm run dev
+  ```
+  *(Frontend chạy tại `http://localhost:3000`).*
 
 Truy cập trình duyệt: **`http://localhost:3000`**
 
