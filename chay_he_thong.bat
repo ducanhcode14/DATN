@@ -9,13 +9,22 @@ echo.
 
 cd /d "%~dp0"
 
-echo [1/3] Đang kiểm tra dịch vụ MongoDB...
-sc query MongoDB | findstr /i "RUNNING" >nul
+:: Đảm bảo thư mục lưu dữ liệu database data\db tồn tại
+if not exist "%~dp0data\db" mkdir "%~dp0data\db"
+
+echo [1/3] Đang kiểm tra cơ sở dữ liệu MongoDB (Port 27017)...
+powershell -NoProfile -Command "$client = New-Object System.Net.Sockets.TcpClient; try { $client.Connect('127.0.0.1', 27017); exit 0 } catch { exit 1 }"
 if %errorlevel% neq 0 (
-    echo [Cảnh báo] MongoDB chưa chạy. Đang cố khởi động dịch vụ MongoDB...
-    net start MongoDB
+    echo [Thông báo] MongoDB chưa chạy trên cổng 27017. Đang tự động bật MongoDB...
+    if exist "C:\Program Files\MongoDB\Server\8.0\bin\mongod.exe" (
+        start "MongoDB Server" /min "C:\Program Files\MongoDB\Server\8.0\bin\mongod.exe" --dbpath "%~dp0data\db" --port 27017 --bind_ip 127.0.0.1
+    ) else (
+        echo Đang thử tìm mongod trong hệ thống...
+        start "MongoDB Server" /min mongod --dbpath "%~dp0data\db" --port 27017 --bind_ip 127.0.0.1
+    )
+    timeout /t 3 /nobreak >nul
 ) else (
-    echo [OK] Dịch vụ MongoDB đang hoạt động tốt.
+    echo [OK] MongoDB đã sẵn sàng hoạt động.
 )
 echo.
 
@@ -27,12 +36,12 @@ timeout /t 3 /nobreak >nul
 echo [3/3] Đang khởi động Frontend (Port 3000)...
 start "Frontend - React Vite" cmd /k "cd /d "%~dp0frontend" && npm run dev"
 
-timeout /t 4 /nobreak >nul
+timeout /t 3 /nobreak >nul
 
 echo.
 echo =====================================================================
 echo  HỆ THỐNG ĐÃ SẴN SÀNG!
-echo  - Frontend: http://localhost:3000
+echo  - Frontend:    http://localhost:3000
 echo  - Backend API: http://localhost:5000
 echo  Đang tự động mở trình duyệt...
 echo =====================================================================
