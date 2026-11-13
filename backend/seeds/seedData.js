@@ -130,8 +130,9 @@ const seedDatabase = async () => {
         name = `Máy tính để bàn Dell OptiPlex ${i <= 20 ? 'Lab 1' : 'Lab 2'} - Máy #${String(i).padStart(2, '0')}`;
         mfg = 'Dell';
         model = i % 2 === 0 ? 'OptiPlex 7090' : 'OptiPlex 3080';
-        importance = i % 5 === 0 ? 4 : 3;
-        monthsAgo = 6 + (i % 36); // tuổi từ 6 tháng đến 3.5 năm
+        // Cho một số thiết bị đầu có độ quan trọng cao và tuổi thọ lớn để tạo mẫu ưu tiên cao
+        importance = i <= 8 ? 5 : i % 5 === 0 ? 4 : 3;
+        monthsAgo = i <= 8 ? 42 + i : 6 + (i % 36); // Thiết bị 1-8 tuổi cao (3.5 - 4 năm)
       } else if (i <= 55) {
         // 15 máy chiếu & màn hình
         catIndex = 1;
@@ -178,7 +179,10 @@ const seedDatabase = async () => {
       
       // Ngày bảo trì gần nhất (ngẫu nhiên từ 1 đến 12 tháng trước, một số chưa bảo trì)
       let lastMaintenanceDate = null;
-      if (i % 6 !== 0) {
+      if (i <= 8) {
+        // Thiết bị ưu tiên cao chưa bảo trì trong vòng 1-2 năm qua
+        lastMaintenanceDate = new Date(now.getTime() - (350 + i * 20) * 24 * 60 * 60 * 1000);
+      } else if (i % 6 !== 0) {
         const lastMaintDaysAgo = 15 + ((i * 13) % 250);
         lastMaintenanceDate = new Date(now.getTime() - lastMaintDaysAgo * 24 * 60 * 60 * 1000);
       }
@@ -231,8 +235,8 @@ const seedDatabase = async () => {
     const incidentsData = [];
 
     for (let j = 1; j <= 170; j++) {
-      // Phân bổ: một số thiết bị hỏng nhiều lần (để test C2), một số ít hỏng
-      const eqIndex = j <= 50 ? j % 15 : (j * 7) % equipments.length;
+      // 60 sự cố đầu tiên tập trung vào các thiết bị từ 0..7 để tạo tần suất hỏng cao
+      const eqIndex = j <= 60 ? (j % 8) : (j * 7) % equipments.length;
       const eq = equipments[eqIndex];
       const title = incidentTitles[j % incidentTitles.length];
       const severity = severities[j % severities.length];
@@ -244,7 +248,7 @@ const seedDatabase = async () => {
       const isResolved = j % 5 !== 0;
       const status = isResolved ? (j % 2 === 0 ? 'resolved' : 'closed') : (j % 3 === 0 ? 'open' : 'in_progress');
       const resolvedAt = isResolved ? new Date(reportedAt.getTime() + (2 + (j % 5)) * 24 * 60 * 60 * 1000) : null;
-      const repairCost = isResolved ? (j % 4 === 0 ? 0 : (200000 + (j % 15) * 150000)) : 0;
+      const repairCost = isResolved ? (eqIndex < 8 ? (500000 + (j % 10) * 150000) : (j % 4 === 0 ? 0 : (200000 + (j % 15) * 150000))) : 0;
 
       incidentsData.push({
         code: `INC-2026-${String(j).padStart(4, '0')}`,
