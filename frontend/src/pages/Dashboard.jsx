@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import axiosClient from '../api/axiosClient';
+import { useAuth } from '../context/AuthContext';
 import {
   Cpu,
   AlertTriangle,
@@ -32,6 +33,12 @@ const PRIORITY_COLORS = ['#ef4444', '#f59e0b', '#10b981']; // High, Medium, Low
 const CATEGORY_COLORS = ['#6366f1', '#3b82f6', '#06b6d4', '#10b981', '#f59e0b'];
 
 const Dashboard = () => {
+  const { user } = useAuth();
+  const role = user?.role || 'user';
+  const isManagerOrAdmin = role === 'admin' || role === 'manager';
+  const isTech = role === 'technician';
+  const isNormalUser = role === 'user';
+
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -75,26 +82,77 @@ const Dashboard = () => {
       {/* Top Welcome Banner */}
       <div className="bg-gradient-to-r from-indigo-700 via-indigo-600 to-indigo-800 rounded-2xl p-6 text-white shadow-lg flex flex-col md:flex-row justify-between items-start md:items-center">
         <div>
-          <h2 className="text-xl font-extrabold tracking-tight">Hệ Thống Quản Lý & Hỗ Trợ Lập Kế Hoạch Bảo Trì</h2>
+          <h2 className="text-xl font-extrabold tracking-tight">
+            {isManagerOrAdmin && 'Hệ Thống Quản Lý & Hỗ Trợ Lập Kế Hoạch Bảo Trì'}
+            {isTech && 'Bàn Làm Việc Kỹ Thuật Viên - Xử Lý Sự Cố & Bảo Trì'}
+            {isNormalUser && 'Cổng Thông Tin Giảng Viên / Người Dùng Thiết Bị'}
+          </h2>
           <p className="mt-1 text-indigo-100 text-sm max-w-2xl">
-            Tự động tổng hợp dữ liệu lịch sử sự cố, tính toán mức độ ưu tiên bảo trì bằng thuật toán MCDA đa tiêu chí C1 - C5.
+            {isManagerOrAdmin &&
+              'Tự động tổng hợp dữ liệu lịch sử sự cố, tính toán mức độ ưu tiên bảo trì bằng thuật toán MCDA đa tiêu chí C1 - C5.'}
+            {isTech &&
+              'Theo dõi các yêu cầu sự cố cần khắc phục, danh sách công việc bảo trì được phân công và cập nhật kết quả.'}
+            {isNormalUser &&
+              'Tra cứu thông tin thiết bị tại phòng học, phòng thực hành và nhanh chóng gửi báo cáo khi thiết bị gặp sự cố.'}
           </p>
         </div>
         <div className="mt-4 md:mt-0 flex space-x-3">
-          <Link
-            to="/priority"
-            className="inline-flex items-center px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-900 font-semibold rounded-lg text-sm shadow transition"
-          >
-            <Flame className="w-4 h-4 mr-1.5" />
-            Đánh Giá Ưu Tiên C1-C5
-          </Link>
-          <Link
-            to="/plans"
-            className="inline-flex items-center px-4 py-2 bg-white/10 hover:bg-white/20 text-white font-medium rounded-lg text-sm border border-white/20 transition"
-          >
-            <CalendarCheck className="w-4 h-4 mr-1.5" />
-            Kế Hoạch Bảo Trì
-          </Link>
+          {isManagerOrAdmin && (
+            <>
+              <Link
+                to="/priority"
+                className="inline-flex items-center px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-900 font-semibold rounded-lg text-sm shadow transition"
+              >
+                <Flame className="w-4 h-4 mr-1.5" />
+                Đánh Giá Ưu Tiên C1-C5
+              </Link>
+              <Link
+                to="/plans"
+                className="inline-flex items-center px-4 py-2 bg-white/10 hover:bg-white/20 text-white font-medium rounded-lg text-sm border border-white/20 transition"
+              >
+                <CalendarCheck className="w-4 h-4 mr-1.5" />
+                Kế Hoạch Bảo Trì
+              </Link>
+            </>
+          )}
+
+          {isTech && (
+            <>
+              <Link
+                to="/incidents"
+                className="inline-flex items-center px-4 py-2 bg-rose-500 hover:bg-rose-400 text-white font-semibold rounded-lg text-sm shadow transition"
+              >
+                <AlertTriangle className="w-4 h-4 mr-1.5" />
+                Sự Cố Cần Xử Lý
+              </Link>
+              <Link
+                to="/plans"
+                className="inline-flex items-center px-4 py-2 bg-white/10 hover:bg-white/20 text-white font-medium rounded-lg text-sm border border-white/20 transition"
+              >
+                <CalendarCheck className="w-4 h-4 mr-1.5" />
+                Công Việc Bảo Trì
+              </Link>
+            </>
+          )}
+
+          {isNormalUser && (
+            <>
+              <Link
+                to="/incidents"
+                className="inline-flex items-center px-4 py-2 bg-rose-500 hover:bg-rose-400 text-white font-semibold rounded-lg text-sm shadow transition"
+              >
+                <AlertTriangle className="w-4 h-4 mr-1.5" />
+                Báo Sự Cố Thiết Bị
+              </Link>
+              <Link
+                to="/equipments"
+                className="inline-flex items-center px-4 py-2 bg-white/10 hover:bg-white/20 text-white font-medium rounded-lg text-sm border border-white/20 transition"
+              >
+                <Cpu className="w-4 h-4 mr-1.5" />
+                Tra Cứu Thiết Bị
+              </Link>
+            </>
+          )}
         </div>
       </div>
 
@@ -234,12 +292,21 @@ const Dashboard = () => {
               Được thuật toán hệ thống tự động đề xuất dựa trên điểm tổng hợp C1 - C5
             </p>
           </div>
-          <Link
-            to="/priority"
-            className="text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold px-3 py-1.5 rounded-lg border border-indigo-200 transition flex items-center"
-          >
-            Đưa vào kế hoạch bảo trì <ArrowRight className="w-3 h-3 ml-1.5" />
-          </Link>
+          {isManagerOrAdmin ? (
+            <Link
+              to="/priority"
+              className="text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold px-3 py-1.5 rounded-lg border border-indigo-200 transition flex items-center"
+            >
+              Đưa vào kế hoạch bảo trì <ArrowRight className="w-3 h-3 ml-1.5" />
+            </Link>
+          ) : (
+            <Link
+              to="/equipments"
+              className="text-xs bg-slate-50 hover:bg-slate-100 text-slate-700 font-semibold px-3 py-1.5 rounded-lg border border-slate-200 transition flex items-center"
+            >
+              Xem danh sách thiết bị <ArrowRight className="w-3 h-3 ml-1.5" />
+            </Link>
+          )}
         </div>
 
         <div className="overflow-x-auto">

@@ -11,22 +11,63 @@ import {
   Layers,
   FileSpreadsheet,
   Users,
+  Search,
+  CheckSquare,
 } from 'lucide-react';
 
 const Sidebar = () => {
-  const { user, isAdmin, isManager } = useAuth();
+  const { user, isAdmin } = useAuth();
+  const role = user?.role || 'user';
 
-  const navigation = [
-    { name: 'Tổng quan (Dashboard)', href: '/', icon: LayoutDashboard },
-    { name: 'Quản lý Thiết bị', href: '/equipments', icon: Cpu },
-    { name: 'Xử lý Sự cố', href: '/incidents', icon: AlertTriangle },
-    { name: 'Đánh giá Ưu tiên (C1-C5)', href: '/priority', icon: Flame, badge: 'MCDA' },
-    { name: 'Kế hoạch Bảo trì', href: '/plans', icon: CalendarCheck },
-    { name: 'Lịch sử Bảo trì', href: '/maintenances', icon: Wrench },
-    { name: 'Danh mục & Vị trí', href: '/categories-locations', icon: Layers },
-    { name: 'Báo cáo & Thống kê', href: '/reports', icon: FileSpreadsheet },
-    ...(isAdmin ? [{ name: 'Quản trị Người dùng', href: '/users', icon: Users }] : []),
-  ];
+  // Phân quyền danh mục Menu theo đúng Ma trận phân quyền (SRS Mục 14)
+  let navigation = [];
+
+  if (role === 'admin') {
+    navigation = [
+      { name: 'Tổng quan (Dashboard)', href: '/', icon: LayoutDashboard },
+      { name: 'Quản lý Thiết bị', href: '/equipments', icon: Cpu },
+      { name: 'Quản lý Sự cố', href: '/incidents', icon: AlertTriangle },
+      { name: 'Đánh giá Ưu tiên (C1-C5)', href: '/priority', icon: Flame, badge: 'MCDA' },
+      { name: 'Kế hoạch Bảo trì', href: '/plans', icon: CalendarCheck },
+      { name: 'Lịch sử Bảo trì', href: '/maintenances', icon: Wrench },
+      { name: 'Danh mục & Vị trí', href: '/categories-locations', icon: Layers },
+      { name: 'Báo cáo & Thống kê', href: '/reports', icon: FileSpreadsheet },
+      { name: 'Quản trị Người dùng', href: '/users', icon: Users },
+    ];
+  } else if (role === 'manager') {
+    navigation = [
+      { name: 'Tổng quan (Dashboard)', href: '/', icon: LayoutDashboard },
+      { name: 'Quản lý Thiết bị', href: '/equipments', icon: Cpu },
+      { name: 'Quản lý Sự cố', href: '/incidents', icon: AlertTriangle },
+      { name: 'Đánh giá Ưu tiên (C1-C5)', href: '/priority', icon: Flame, badge: 'MCDA' },
+      { name: 'Lập Kế hoạch Bảo trì', href: '/plans', icon: CalendarCheck },
+      { name: 'Lịch sử Bảo trì', href: '/maintenances', icon: Wrench },
+      { name: 'Danh mục & Vị trí', href: '/categories-locations', icon: Layers },
+      { name: 'Báo cáo & Thống kê', href: '/reports', icon: FileSpreadsheet },
+    ];
+  } else if (role === 'technician') {
+    navigation = [
+      { name: 'Bàn làm việc Kỹ thuật', href: '/', icon: LayoutDashboard },
+      { name: 'Danh sách Thiết bị', href: '/equipments', icon: Cpu },
+      { name: 'Tiếp nhận & Xử lý Sự cố', href: '/incidents', icon: AlertTriangle },
+      { name: 'Thực hiện Kế hoạch Bảo trì', href: '/plans', icon: CheckSquare },
+      { name: 'Nhật ký Bảo trì', href: '/maintenances', icon: Wrench },
+    ];
+  } else {
+    // Role: user (Giảng viên / Người sử dụng thiết bị)
+    navigation = [
+      { name: 'Trang cá nhân', href: '/', icon: LayoutDashboard },
+      { name: 'Tra cứu Thiết bị Phòng học', href: '/equipments', icon: Search },
+      { name: 'Báo Hỏng & Theo dõi Sự cố', href: '/incidents', icon: AlertTriangle },
+    ];
+  }
+
+  const roleLabels = {
+    admin: 'Quản trị viên (Admin)',
+    manager: 'Quản lý thiết bị',
+    technician: 'Nhân viên kỹ thuật',
+    user: 'Giảng viên / Người dùng',
+  };
 
   return (
     <aside className="w-64 bg-slate-900 text-slate-300 flex flex-col flex-shrink-0 min-h-screen border-r border-slate-800">
@@ -43,8 +84,11 @@ const Sidebar = () => {
 
       {/* Navigation links */}
       <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-        <div className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-          Menu Nghiệp Vụ
+        <div className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400 flex items-center justify-between">
+          <span>Menu Nghiệp Vụ</span>
+          <span className="text-[10px] font-bold text-indigo-400 uppercase">
+            {role}
+          </span>
         </div>
         {navigation.map((item) => (
           <NavLink
@@ -80,14 +124,8 @@ const Sidebar = () => {
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-xs font-semibold text-white truncate">{user?.fullName}</p>
-            <p className="text-[11px] text-slate-400 capitalize">
-              {user?.role === 'admin'
-                ? 'Quản trị viên'
-                : user?.role === 'manager'
-                ? 'Quản lý thiết bị'
-                : user?.role === 'technician'
-                ? 'Kỹ thuật viên'
-                : 'Người dùng'}
+            <p className="text-[11px] text-slate-400">
+              {roleLabels[role] || 'Người dùng'}
             </p>
           </div>
         </div>
@@ -97,4 +135,3 @@ const Sidebar = () => {
 };
 
 export default Sidebar;
-
