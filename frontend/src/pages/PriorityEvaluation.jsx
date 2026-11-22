@@ -13,6 +13,7 @@ import {
   Filter,
   ArrowUpDown,
   FileCheck,
+  CalendarCheck,
 } from 'lucide-react';
 import { PriorityBadge, EquipmentStatusBadge } from '../components/StatusBadge';
 
