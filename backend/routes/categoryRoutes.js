@@ -6,6 +6,6 @@ const { protect, authorize } = require('../middlewares/authMiddleware');
 router.get('/', protect, categoryController.getCategories);
 router.post('/', protect, authorize('admin', 'manager'), categoryController.createCategory);
 router.put('/:id', protect, authorize('admin', 'manager'), categoryController.updateCategory);
+router.delete('/:id', protect, authorize('admin', 'manager'), categoryController.deleteCategory);
 
 module.exports = router;
-

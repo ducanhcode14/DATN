@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Wrench, Shield, CheckCircle, AlertCircle, ArrowRight, Lock, User } from 'lucide-react';
+import { Wrench, AlertCircle, ArrowRight, Lock, User } from 'lucide-react';
 
 const Login = () => {
-  const [username, setUsername] = useState('admin');
-  const [password, setPassword] = useState('admin123');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const { login, loading } = useAuth();
   const navigate = useNavigate();
@@ -19,11 +19,6 @@ const Login = () => {
     } else {
       setErrorMsg(res.message);
     }
-  };
-
-  const handleSelectPreset = (u, p) => {
-    setUsername(u);
-    setPassword(p);
   };
 
   return (
@@ -100,59 +95,6 @@ const Login = () => {
               {!loading && <ArrowRight className="w-4 h-4 ml-2" />}
             </button>
           </form>
-
-          {/* Quick preset buttons for graduation thesis defense demo */}
-          <div className="mt-6 pt-6 border-t border-slate-700">
-            <p className="text-xs font-medium text-slate-400 text-center mb-3">
-              ⚡ Chọn nhanh tài khoản demo bảo vệ đồ án:
-            </p>
-            <div className="grid grid-cols-2 gap-2 text-xs">
-              <button
-                type="button"
-                onClick={() => handleSelectPreset('admin', 'admin123')}
-                className="p-2 rounded-lg bg-slate-700/60 hover:bg-slate-700 text-slate-200 border border-slate-600 text-left transition flex items-center justify-between"
-              >
-                <div>
-                  <div className="font-semibold text-white">Quản trị viên</div>
-                  <div className="text-[10px] text-slate-400">admin / admin123</div>
-                </div>
-                <Shield className="w-3.5 h-3.5 text-indigo-400" />
-              </button>
-              <button
-                type="button"
-                onClick={() => handleSelectPreset('quanly', 'quanly123')}
-                className="p-2 rounded-lg bg-slate-700/60 hover:bg-slate-700 text-slate-200 border border-slate-600 text-left transition flex items-center justify-between"
-              >
-                <div>
-                  <div className="font-semibold text-white">Quản lý TB</div>
-                  <div className="text-[10px] text-slate-400">quanly / quanly123</div>
-                </div>
-                <CheckCircle className="w-3.5 h-3.5 text-teal-400" />
-              </button>
-              <button
-                type="button"
-                onClick={() => handleSelectPreset('kythuat', 'kythuat123')}
-                className="p-2 rounded-lg bg-slate-700/60 hover:bg-slate-700 text-slate-200 border border-slate-600 text-left transition flex items-center justify-between"
-              >
-                <div>
-                  <div className="font-semibold text-white">Kỹ thuật viên</div>
-                  <div className="text-[10px] text-slate-400">kythuat / kythuat123</div>
-                </div>
-                <Wrench className="w-3.5 h-3.5 text-amber-400" />
-              </button>
-              <button
-                type="button"
-                onClick={() => handleSelectPreset('giangvien', 'user123')}
-                className="p-2 rounded-lg bg-slate-700/60 hover:bg-slate-700 text-slate-200 border border-slate-600 text-left transition flex items-center justify-between"
-              >
-                <div>
-                  <div className="font-semibold text-white">Giảng viên/User</div>
-                  <div className="text-[10px] text-slate-400">giangvien / user123</div>
-                </div>
-                <User className="w-3.5 h-3.5 text-sky-400" />
-              </button>
-            </div>
-          </div>
         </div>
 
         <div className="text-center mt-6 text-xs text-slate-500">

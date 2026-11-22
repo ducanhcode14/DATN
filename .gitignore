@@ -25,6 +25,14 @@ yarn-error.log*
 logs/
 *.log
 
+# Python cache & Office temp
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+~$*.docx
+~$*.pptx
+
 # Editor / OS
 .DS_Store
 Thumbs.db

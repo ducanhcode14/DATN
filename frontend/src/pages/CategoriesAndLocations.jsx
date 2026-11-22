@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axiosClient from '../api/axiosClient';
 import { useAuth } from '../context/AuthContext';
-import { Layers, MapPin, Plus, Edit, FolderPlus } from 'lucide-react';
+import { Layers, MapPin, Plus, Edit, Trash2 } from 'lucide-react';
 
 const CategoriesAndLocations = () => {
   const { isManager } = useAuth();
@@ -10,11 +10,13 @@ const CategoriesAndLocations = () => {
   const [locations, setLocations] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Modals
+  // Modals & Edit States
   const [showCatModal, setShowCatModal] = useState(false);
-  const [showLocModal, setShowLocModal] = useState(false);
-
+  const [editingCat, setEditingCat] = useState(null);
   const [catForm, setCatForm] = useState({ name: '', code: '', description: '' });
+
+  const [showLocModal, setShowLocModal] = useState(false);
+  const [editingLoc, setEditingLoc] = useState(null);
   const [locForm, setLocForm] = useState({ name: '', building: '', room: '', department: '' });
 
   useEffect(() => {
@@ -37,31 +39,114 @@ const CategoriesAndLocations = () => {
     }
   };
 
+  // --- Category Handlers ---
+  const handleOpenAddCat = () => {
+    setEditingCat(null);
+    setCatForm({ name: '', code: '', description: '' });
+    setShowCatModal(true);
+  };
+
+  const handleOpenEditCat = (cat) => {
+    setEditingCat(cat);
+    setCatForm({
+      name: cat.name || '',
+      code: cat.code || '',
+      description: cat.description || '',
+    });
+    setShowCatModal(true);
+  };
+
   const handleCatSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axiosClient.post('/equipment-categories', catForm);
+      if (editingCat) {
+        const res = await axiosClient.put(`/equipment-categories/${editingCat._id}`, catForm);
+        if (res.success) {
+          setShowCatModal(false);
+          setEditingCat(null);
+          setCatForm({ name: '', code: '', description: '' });
+          fetchData();
+        }
+      } else {
+        const res = await axiosClient.post('/equipment-categories', catForm);
+        if (res.success) {
+          setShowCatModal(false);
+          setCatForm({ name: '', code: '', description: '' });
+          fetchData();
+        }
+      }
+    } catch (err) {
+      alert(err.error?.message || err.message || 'Lỗi lưu nhóm danh mục');
+    }
+  };
+
+  const handleDeleteCat = async (cat) => {
+    if (!window.confirm(`Bạn có chắc chắn muốn xóa nhóm thiết bị "${cat.name}" (${cat.code})?`)) {
+      return;
+    }
+    try {
+      const res = await axiosClient.delete(`/equipment-categories/${cat._id}`);
       if (res.success) {
-        setShowCatModal(false);
-        setCatForm({ name: '', code: '', description: '' });
         fetchData();
       }
     } catch (err) {
-      alert(err.error?.message || 'Lỗi thêm nhóm danh mục');
+      alert(err.error?.message || err.message || 'Lỗi khi xóa nhóm thiết bị');
     }
+  };
+
+  // --- Location Handlers ---
+  const handleOpenAddLoc = () => {
+    setEditingLoc(null);
+    setLocForm({ name: '', building: '', room: '', department: '' });
+    setShowLocModal(true);
+  };
+
+  const handleOpenEditLoc = (loc) => {
+    setEditingLoc(loc);
+    setLocForm({
+      name: loc.name || '',
+      building: loc.building || '',
+      room: loc.room || '',
+      department: loc.department || '',
+    });
+    setShowLocModal(true);
   };
 
   const handleLocSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axiosClient.post('/locations', locForm);
+      if (editingLoc) {
+        const res = await axiosClient.put(`/locations/${editingLoc._id}`, locForm);
+        if (res.success) {
+          setShowLocModal(false);
+          setEditingLoc(null);
+          setLocForm({ name: '', building: '', room: '', department: '' });
+          fetchData();
+        }
+      } else {
+        const res = await axiosClient.post('/locations', locForm);
+        if (res.success) {
+          setShowLocModal(false);
+          setLocForm({ name: '', building: '', room: '', department: '' });
+          fetchData();
+        }
+      }
+    } catch (err) {
+      alert(err.error?.message || err.message || 'Lỗi lưu vị trí');
+    }
+  };
+
+  const handleDeleteLoc = async (loc) => {
+    if (!window.confirm(`Bạn có chắc chắn muốn xóa vị trí/phòng "${loc.name}" (${loc.building} - ${loc.room})?`)) {
+      return;
+    }
+    try {
+      const res = await axiosClient.delete(`/locations/${loc._id}`);
       if (res.success) {
-        setShowLocModal(false);
-        setLocForm({ name: '', building: '', room: '', department: '' });
         fetchData();
       }
     } catch (err) {
-      alert(err.error?.message || 'Lỗi thêm vị trí');
+      alert(err.error?.message || err.message || 'Lỗi khi xóa vị trí/phòng');
     }
   };
 
@@ -77,14 +162,14 @@ const CategoriesAndLocations = () => {
           <div className="flex space-x-2">
             {activeTab === 'categories' ? (
               <button
-                onClick={() => setShowCatModal(true)}
+                onClick={handleOpenAddCat}
                 className="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold shadow-xs transition"
               >
                 <Plus className="w-4 h-4 mr-1.5" /> Thêm Nhóm Danh Mục
               </button>
             ) : (
               <button
-                onClick={() => setShowLocModal(true)}
+                onClick={handleOpenAddLoc}
                 className="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold shadow-xs transition"
               >
                 <Plus className="w-4 h-4 mr-1.5" /> Thêm Vị Trí / Phòng Mới
@@ -131,6 +216,7 @@ const CategoriesAndLocations = () => {
                   <th className="px-4 py-3 text-left">Tên Nhóm Thiết Bị</th>
                   <th className="px-4 py-3 text-left">Mô Tả Chức Năng</th>
                   <th className="px-4 py-3 text-center">Trạng Thái</th>
+                  {isManager && <th className="px-4 py-3 text-right">Thao Tác</th>}
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200 bg-white">
@@ -144,8 +230,35 @@ const CategoriesAndLocations = () => {
                         Hoạt động
                       </span>
                     </td>
+                    {isManager && (
+                      <td className="px-4 py-3 text-right whitespace-nowrap">
+                        <div className="inline-flex items-center space-x-1.5">
+                          <button
+                            onClick={() => handleOpenEditCat(c)}
+                            className="inline-flex items-center px-2 py-1 text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 rounded font-medium transition"
+                            title="Sửa thông tin"
+                          >
+                            <Edit className="w-3.5 h-3.5 mr-1 text-indigo-500" /> Sửa
+                          </button>
+                          <button
+                            onClick={() => handleDeleteCat(c)}
+                            className="inline-flex items-center px-2 py-1 text-slate-600 hover:text-rose-600 hover:bg-rose-50 rounded font-medium transition"
+                            title="Xóa nhóm"
+                          >
+                            <Trash2 className="w-3.5 h-3.5 mr-1 text-rose-500" /> Xóa
+                          </button>
+                        </div>
+                      </td>
+                    )}
                   </tr>
                 ))}
+                {categories.length === 0 && (
+                  <tr>
+                    <td colSpan={isManager ? 5 : 4} className="px-4 py-8 text-center text-slate-400">
+                      Chưa có nhóm thiết bị nào.
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
@@ -162,6 +275,7 @@ const CategoriesAndLocations = () => {
                   <th className="px-4 py-3 text-left">Số Phòng</th>
                   <th className="px-4 py-3 text-left">Đơn Vị Quản Lý / Khoa</th>
                   <th className="px-4 py-3 text-center">Trạng Thái</th>
+                  {isManager && <th className="px-4 py-3 text-right">Thao Tác</th>}
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200 bg-white">
@@ -176,19 +290,48 @@ const CategoriesAndLocations = () => {
                         Hoạt động
                       </span>
                     </td>
+                    {isManager && (
+                      <td className="px-4 py-3 text-right whitespace-nowrap">
+                        <div className="inline-flex items-center space-x-1.5">
+                          <button
+                            onClick={() => handleOpenEditLoc(l)}
+                            className="inline-flex items-center px-2 py-1 text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 rounded font-medium transition"
+                            title="Sửa vị trí/phòng"
+                          >
+                            <Edit className="w-3.5 h-3.5 mr-1 text-indigo-500" /> Sửa
+                          </button>
+                          <button
+                            onClick={() => handleDeleteLoc(l)}
+                            className="inline-flex items-center px-2 py-1 text-slate-600 hover:text-rose-600 hover:bg-rose-50 rounded font-medium transition"
+                            title="Xóa vị trí/phòng"
+                          >
+                            <Trash2 className="w-3.5 h-3.5 mr-1 text-rose-500" /> Xóa
+                          </button>
+                        </div>
+                      </td>
+                    )}
                   </tr>
                 ))}
+                {locations.length === 0 && (
+                  <tr>
+                    <td colSpan={isManager ? 6 : 5} className="px-4 py-8 text-center text-slate-400">
+                      Chưa có vị trí/phòng nào.
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
         )}
       </div>
 
-      {/* Modal Category */}
+      {/* Modal Category (Thêm / Sửa) */}
       {showCatModal && (
         <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200">
-            <h3 className="text-base font-bold text-slate-900 mb-4">Thêm Nhóm Thiết Bị Mới</h3>
+            <h3 className="text-base font-bold text-slate-900 mb-4">
+              {editingCat ? 'Cập Nhật Nhóm Thiết Bị' : 'Thêm Nhóm Thiết Bị Mới'}
+            </h3>
             <form onSubmit={handleCatSubmit} className="space-y-3 text-xs">
               <div>
                 <label className="block font-semibold text-slate-700 mb-1">Mã nhóm *</label>
@@ -233,7 +376,7 @@ const CategoriesAndLocations = () => {
                   type="submit"
                   className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-lg shadow-sm"
                 >
-                  Thêm nhóm
+                  {editingCat ? 'Lưu thay đổi' : 'Thêm nhóm'}
                 </button>
               </div>
             </form>
@@ -241,11 +384,13 @@ const CategoriesAndLocations = () => {
         </div>
       )}
 
-      {/* Modal Location */}
+      {/* Modal Location (Thêm / Sửa) */}
       {showLocModal && (
         <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200">
-            <h3 className="text-base font-bold text-slate-900 mb-4">Thêm Vị Trí / Phòng Mới</h3>
+            <h3 className="text-base font-bold text-slate-900 mb-4">
+              {editingLoc ? 'Cập Nhật Vị Trí / Phòng' : 'Thêm Vị Trí / Phòng Mới'}
+            </h3>
             <form onSubmit={handleLocSubmit} className="space-y-3 text-xs">
               <div>
                 <label className="block font-semibold text-slate-700 mb-1">Tên vị trí *</label>
@@ -304,7 +449,7 @@ const CategoriesAndLocations = () => {
                   type="submit"
                   className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-lg shadow-sm"
                 >
-                  Thêm vị trí
+                  {editingLoc ? 'Lưu thay đổi' : 'Thêm vị trí'}
                 </button>
               </div>
             </form>
@@ -316,4 +461,3 @@ const CategoriesAndLocations = () => {
 };
 
 export default CategoriesAndLocations;
-
